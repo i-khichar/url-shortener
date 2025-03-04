@@ -24,6 +24,20 @@ public class UrlMappingService {
     private UrlMappingRepository urlMappingRepository;
     private ClickEventRepository clickEventRepository;
 
+    public UrlMapping getOriginalUrl(String shortUrl) {
+        UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl);
+        if(urlMapping != null){
+            urlMapping.setClickCount(urlMapping.getClickCount() + 1);
+            urlMappingRepository.save(urlMapping);
+
+            ClickEvent clickEvent = new ClickEvent();
+            clickEvent.setClickDate(LocalDateTime.now());
+            clickEvent.setUrlMapping(urlMapping);
+            clickEventRepository.save(clickEvent);
+        }
+        return urlMapping;
+    }
+
     public UrlMappingDTO createShortUrl(String originalUrl, User user) {
         String shortUrl = generateShortUrl();
         UrlMapping urlMapping = new UrlMapping();
